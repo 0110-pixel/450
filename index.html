@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#0f1e33">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>من 10 إلى 450</title>
+<style>
+:root{color-scheme:light dark;--bg:#eef1f5;--ink:#0f1e33;--card:#fff;--line:#d3dae4;--acc:#0b7a5a;--accink:#fff;--mute:#5a6a7e;--hd:#0f1e33;--hdink:#fff;--hdmute:#9fb0c6;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b121b;--ink:#e7edf5;--card:#142030;--line:#26364a;--acc:#2fbf93;--accink:#04140e;--mute:#8fa1b6;--hd:#142030;--hdink:#fff;--hdmute:#8fa1b6}}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif}
+main{max-width:520px;margin:0 auto;padding:0 14px 40px}
+header{background:var(--hd);color:var(--hdink);border-radius:0 0 16px 16px;padding:16px 18px 14px;margin:0 -14px 14px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;box-shadow:0 2px 10px rgba(0,0,0,.18)}
+.lbl{font-size:13px;color:var(--hdmute)}
+.tot{font-size:40px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1;direction:ltr;text-align:right}
+.tot small{font-size:16px;font-weight:500;color:var(--hdmute)}
+.bar{height:6px;background:rgba(255,255,255,.18);border-radius:3px;overflow:hidden;margin:10px 0 8px}
+.bar i{display:block;height:100%;width:0;background:var(--acc);transition:width .2s}
+.meta{display:flex;justify-content:space-between;align-items:center;font-size:14px;color:var(--hdmute)}
+.meta b{color:var(--hdink);font-variant-numeric:tabular-nums}
+button.reset{font:inherit;font-size:13px;color:var(--hdink);background:none;border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:4px 12px;position:relative;overflow:hidden;isolation:isolate;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:none}
+button.reset::before{content:"";position:absolute;inset:0;background:rgba(255,255,255,.4);transform:scaleX(0);transform-origin:right;z-index:-1}
+button.reset.hold::before{animation:fill 2s linear forwards}
+@keyframes fill{to{transform:scaleX(1)}}
+@media (prefers-reduced-motion:reduce){button.reset.hold::before{animation-duration:2s}}
+#g{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;direction:ltr}
+#g button{font:600 17px system-ui,sans-serif;font-variant-numeric:tabular-nums;height:54px;background:var(--card);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:0;position:relative;transition:background .12s,transform .08s}
+#g button:active{transform:scale(.95)}
+#g button.on{background:var(--acc);color:var(--accink);border-color:var(--acc)}
+#g button:focus-visible,button.reset:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+</style>
+</head>
+<body>
+<main>
+<header>
+<div class="lbl">مجموع الأرقام المعلّمة</div>
+<div class="tot"><span id="t">0</span> <small>/ 10350</small></div>
+<div class="bar"><i id="p"></i></div>
+<div class="meta"><span>المربعات: <b id="c">0 / 45</b></span><button class="reset" id="r">اضغط مطولا لمسح الكل</button></div>
+</header>
+<div id="g"></div>
+</main>
+<script>
+var N=45,K="sq10to450",s=new Array(N).fill(0),TOTAL=10350;
+try{var d=JSON.parse(localStorage.getItem(K)||"null");if(Array.isArray(d)&&d.length===N)s=d}catch(e){}
+var g=document.getElementById("g"),B=[];
+function save(){try{localStorage.setItem(K,JSON.stringify(s))}catch(e){}}
+function upd(){var n=0,t=0;for(var i=0;i<N;i++)if(s[i]){n++;t+=(i+1)*10}
+document.getElementById("t").textContent=t.toLocaleString("en-US");
+document.getElementById("c").textContent=n+" / "+N;
+document.getElementById("p").style.width=(t/TOTAL*100)+"%"}
+for(var i=0;i<N;i++){(function(i){var b=document.createElement("button");
+b.textContent=(i+1)*10;b.className=s[i]?"on":"";b.setAttribute("aria-pressed",!!s[i]);
+b.onclick=function(){s[i]=s[i]?0:1;b.className=s[i]?"on":"";b.setAttribute("aria-pressed",!!s[i]);save();upd()};
+g.appendChild(b);B.push(b)})(i)}
+var R=document.getElementById("r"),T=null;
+function clr(){s.fill(0);B.forEach(function(b){b.className="";b.setAttribute("aria-pressed","false")});save();upd()}
+function go(){stop();R.classList.add("hold");T=setTimeout(function(){T=null;R.classList.remove("hold");clr()},2000)}
+function stop(){if(T){clearTimeout(T);T=null}R.classList.remove("hold")}
+R.addEventListener("pointerdown",go);
+["pointerup","pointerleave","pointercancel"].forEach(function(e){R.addEventListener(e,stop)});
+R.addEventListener("contextmenu",function(e){e.preventDefault()});
+R.addEventListener("keydown",function(e){if((e.key==="Enter"||e.key===" ")&&!e.repeat)go()});
+R.addEventListener("keyup",stop);
+upd();
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}
+</script>
+</body>
+</html>
